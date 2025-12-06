@@ -1,6 +1,16 @@
-import { defineDb } from 'astro:db';
+import { defineDb } from "astro:db";
+import {
+  VocabDecks,
+  VocabCards,
+  VocabStudySessions,
+  VocabReviews,
+} from "./tables";
 
-// https://astro.build/db/config
 export default defineDb({
-  tables: {}
+  tables: {
+    VocabDecks,
+    VocabCards,
+    VocabStudySessions,
+    VocabReviews,
+  },
 });
