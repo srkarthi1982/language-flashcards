@@ -1,16 +1,8 @@
 import { defineDb } from "astro:db";
-import {
-  VocabDecks,
-  VocabCards,
-  VocabStudySessions,
-  VocabReviews,
-} from "./tables";
+import { LanguageFlashcards } from "./tables";
 
 export default defineDb({
   tables: {
-    VocabDecks,
-    VocabCards,
-    VocabStudySessions,
-    VocabReviews,
+    LanguageFlashcards,
   },
 });

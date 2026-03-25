@@ -1,0 +1,24 @@
+---
+interface Props {
+  title: string;
+  subtitle?: string;
+  appKey: string;
+}
+
+const { title, subtitle = "Personal language workspace", appKey } = Astro.props;
+const rootAppUrl = Astro.locals.rootAppUrl ?? "https://ansiversa.com";
+---
+
+<header class="border-b border-white/10 bg-slate-950/80 backdrop-blur">
+  <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+    <div>
+      <p class="text-xs uppercase tracking-[0.18em] text-slate-400">{appKey}</p>
+      <h1 class="text-xl font-semibold text-white">{title}</h1>
+      <p class="text-sm text-slate-300">{subtitle}</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href={`${rootAppUrl}/dashboard`} class="av-btn av-btn--secondary">Dashboard</a>
+      <a href="/app" class="av-btn">Workspace</a>
+    </div>
+  </div>
+</header>

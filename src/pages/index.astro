@@ -1,93 +1,39 @@
 ---
 import AppShell from "../layouts/AppShell.astro";
-import { AvContainer, AvButton } from "@ansiversa/components";
+import { AvButton, AvContainer } from "@ansiversa/components";
 
-const title = "Language Flashcards – Ansiversa";
-const description = "Practice vocabulary effectively.";
+const title = "Language Flashcards | Ansiversa";
+const description =
+  "Create, organize, and review language flashcards in a premium personal workspace.";
 ---
 
 <AppShell title={title} description={description}>
-  <!-- Hero -->
   <section class="av-hero">
     <AvContainer size="narrow" className="av-hero__content--narrow">
       <div class="av-hero__content">
-        <div class="av-kicker">
-          <span>Learning · Ansiversa Mini App</span>
-        </div>
-        <h1 class="av-gradient-text">Language Flashcards</h1>
+        <div class="av-kicker"><span>Language Learning · Ansiversa Mini App</span></div>
+        <h1 class="av-gradient-text">Build your language memory, one card at a time.</h1>
         <p>
-          Practice vocabulary effectively.
+          Language Flashcards gives you a clean workspace for vocabulary mastery with favorites,
+          organized decks, archive history, and focused review.
         </p>
       </div>
       <div class="av-cta-row">
-        <AvButton href="https://language-flashcards.ansiversa.com">Launch Language</AvButton>
+        <AvButton href="/app">Open Workspace</AvButton>
       </div>
     </AvContainer>
   </section>
 
-  <!-- Problem -->
   <section class="av-section">
     <AvContainer size="narrow">
       <div class="av-section-header">
-        <h2 class="av-section-title">The problem it solves</h2>
-        <p class="av-section-lead">
-          Learning tools are scattered across tabs, apps, and messy notes.
-        </p>
+        <h2 class="av-section-title">Everything you need in V1</h2>
       </div>
-      <div class="av-section-body space-y-3 text-slate-300">
-        <p>Language Flashcards focuses on one part of your learning flow and keeps it clear.</p>
-      </div>
-    </AvContainer>
-  </section>
-
-  <!-- Why this mini app -->
-  <section class="av-section">
-    <AvContainer size="narrow">
-      <div class="av-section-header">
-        <h2 class="av-section-title">Why Language Flashcards feels different</h2>
-        <p class="av-section-lead">
-          A focused mini app inside the larger Ansiversa ecosystem.
-        </p>
-      </div>
-      <div class="av-section-body">
-        <ul class="space-y-2 text-slate-300 list-disc list-inside">
-          <li>Designed specifically for learners, students, and educators.</li>
-          <li>Removes distractions so you can focus on actual understanding.</li>
-          <li>Built on the fast, unified Ansiversa ecosystem.</li>
-        </ul>
-      </div>
-    </AvContainer>
-  </section>
-
-  <!-- How it works -->
-  <section class="av-section">
-    <AvContainer size="narrow">
-      <div class="av-section-header">
-        <h2 class="av-section-title">How it works</h2>
-        <p class="av-section-lead">
-          Simple, clear steps so people can start in under a minute.
-        </p>
-      </div>
-      <ol class="av-section-body space-y-2 text-slate-300 list-decimal list-inside">
-        <li>Open Language Flashcards in your browser.</li>
-        <li>Add the topic, content, or material you want to work with.</li>
-        <li>Use the focused tools to learn, revise, or practice within minutes.</li>
-      </ol>
-    </AvContainer>
-  </section>
-
-  <!-- Final CTA -->
-  <section class="av-section">
-    <AvContainer size="narrow">
-      <div class="av-section-header">
-        <h2 class="av-section-title">Ready to try Language Flashcards?</h2>
-        <p class="av-section-lead">
-          Open the app, follow the simple flow, and let it handle the heavy lifting.
-        </p>
-      </div>
-      <div class="av-cta-row">
-        <AvButton href="https://language-flashcards.ansiversa.com">Start with Language</AvButton>
-      </div>
+      <ul class="av-section-body list-disc space-y-2 pl-5 text-slate-300">
+        <li>Create and edit cards with front/back, pronunciation, examples, and notes.</li>
+        <li>Organize by language, deck, and topic with lightweight filters.</li>
+        <li>Favorite key flashcards, archive older ones, and keep full history.</li>
+      </ul>
     </AvContainer>
   </section>
 </AppShell>

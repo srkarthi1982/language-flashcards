@@ -1,0 +1,114 @@
+---
+import AppShell from "../../layouts/AppShell.astro";
+import AvMiniAppBar from "../../components/AvMiniAppBar.astro";
+import { actions } from "astro:actions";
+import { listLanguageFlashcardsForUser, getLanguageFlashcardSummary } from "../../lib/flashcards";
+
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect("/");
+}
+
+const flashcards = await listLanguageFlashcardsForUser(user.id);
+const summary = getLanguageFlashcardSummary(flashcards);
+---
+
+<AppShell title="Language Flashcards Workspace" description="Manage your language flashcards.">
+  <AvMiniAppBar appKey="language-flashcards" title="Language Flashcards" subtitle="Personal language workspace" />
+  <main
+    class="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6 lg:px-8"
+    x-data="window.flashcardsAppStore.init({ flashcards: JSON.parse($el.dataset.flashcards) })"
+    data-flashcards={JSON.stringify(flashcards)}
+  >
+    <section class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <article class="rounded-xl border border-white/10 bg-slate-900/80 p-4"><p class="text-sm text-slate-300">Total</p><p class="text-2xl font-semibold text-white">{summary.total}</p></article>
+      <article class="rounded-xl border border-white/10 bg-slate-900/80 p-4"><p class="text-sm text-slate-300">Active</p><p class="text-2xl font-semibold text-white">{summary.active}</p></article>
+      <article class="rounded-xl border border-white/10 bg-slate-900/80 p-4"><p class="text-sm text-slate-300">Favorites</p><p class="text-2xl font-semibold text-white">{summary.favorites}</p></article>
+      <article class="rounded-xl border border-white/10 bg-slate-900/80 p-4"><p class="text-sm text-slate-300">Archived</p><p class="text-2xl font-semibold text-white">{summary.archived}</p></article>
+      <article class="rounded-xl border border-white/10 bg-slate-900/80 p-4"><p class="text-sm text-slate-300">Languages</p><p class="text-2xl font-semibold text-white">{summary.languageCount}</p></article>
+      <article class="rounded-xl border border-white/10 bg-slate-900/80 p-4"><p class="text-sm text-slate-300">Decks</p><p class="text-2xl font-semibold text-white">{summary.deckCount}</p></article>
+    </section>
+
+    <section class="rounded-2xl border border-white/10 bg-slate-900/70 p-4 sm:p-6">
+      <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex flex-wrap gap-2">
+          <button class="av-btn av-btn--secondary" @click="activeTab='overview'">Overview</button>
+          <button class="av-btn av-btn--secondary" @click="activeTab='flashcards'">Flashcards</button>
+          <button class="av-btn av-btn--secondary" @click="activeTab='favorites'">Favorites</button>
+          <button class="av-btn av-btn--secondary" @click="activeTab='archived'">Archived</button>
+        </div>
+        <button class="av-btn" @click="openCreateModal">Create flashcard</button>
+      </div>
+
+      <div class="mb-4 grid gap-3 sm:grid-cols-4">
+        <input class="av-input" placeholder="Search front/back text" x-model="search" />
+        <input class="av-input" placeholder="Language" x-model="filters.language" />
+        <input class="av-input" placeholder="Deck" x-model="filters.deck" />
+        <input class="av-input" placeholder="Topic" x-model="filters.topic" />
+      </div>
+
+      <div class="space-y-3" x-show="visibleFlashcards.length > 0">
+        <template x-for="item in visibleFlashcards" :key="item.id">
+          <article class="rounded-xl border border-white/10 bg-slate-950/70 p-4">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p class="text-sm text-slate-400" x-text="[item.language || 'Any language', item.deck || 'General', item.topic || 'No topic'].join(' · ')"></p>
+                <h3 class="text-lg font-semibold text-white" x-text="item.frontText"></h3>
+                <p class="text-slate-200" x-text="item.backText"></p>
+              </div>
+              <div class="flex gap-2">
+                <form method="POST" action={actions.toggleLanguageFlashcardFavorite}>
+                  <input type="hidden" name="id" :value="item.id" />
+                  <button class="av-btn av-btn--secondary" x-text="item.isFavorite ? '★ Favorite' : '☆ Favorite'"></button>
+                </form>
+                <a class="av-btn av-btn--secondary" :href="`/app/flashcards/${item.id}`">Details</a>
+                <button class="av-btn av-btn--secondary" @click="openEditModal(item)">Edit</button>
+              </div>
+            </div>
+          </article>
+        </template>
+      </div>
+      <div class="rounded-xl border border-dashed border-white/20 p-8 text-center text-slate-300" x-show="visibleFlashcards.length === 0">
+        No flashcards match this view yet.
+      </div>
+    </section>
+
+    <div class="fixed inset-0 z-40 flex items-end justify-center bg-slate-950/70 p-4" x-show="isDrawerOpen" x-cloak>
+      <div class="w-full max-w-2xl rounded-2xl border border-white/10 bg-slate-900 p-5">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="text-xl font-semibold text-white" x-text="form.id ? 'Edit flashcard' : 'Create flashcard'"></h2>
+          <button class="av-btn av-btn--secondary" @click="closeDrawer">Close</button>
+        </div>
+
+        <form method="POST" action={actions.createLanguageFlashcard} class="space-y-3" x-show="!form.id">
+          <div class="grid gap-3 sm:grid-cols-2">
+            <input class="av-input" name="language" placeholder="Language" x-model="form.language" />
+            <input class="av-input" name="deck" placeholder="Deck" x-model="form.deck" />
+          </div>
+          <input class="av-input" name="topic" placeholder="Topic" x-model="form.topic" />
+          <textarea class="av-input min-h-24" name="frontText" placeholder="Front text" x-model="form.frontText" required></textarea>
+          <textarea class="av-input min-h-24" name="backText" placeholder="Back text" x-model="form.backText" required></textarea>
+          <input class="av-input" name="pronunciation" placeholder="Pronunciation (optional)" x-model="form.pronunciation" />
+          <textarea class="av-input min-h-24" name="exampleText" placeholder="Example sentence (optional)" x-model="form.exampleText"></textarea>
+          <textarea class="av-input min-h-24" name="notes" placeholder="Notes (optional)" x-model="form.notes"></textarea>
+          <button class="av-btn" type="submit">Save flashcard</button>
+        </form>
+
+        <form method="POST" action={actions.updateLanguageFlashcard} class="space-y-3" x-show="form.id">
+          <input type="hidden" name="id" :value="form.id" />
+          <div class="grid gap-3 sm:grid-cols-2">
+            <input class="av-input" name="language" placeholder="Language" x-model="form.language" />
+            <input class="av-input" name="deck" placeholder="Deck" x-model="form.deck" />
+          </div>
+          <input class="av-input" name="topic" placeholder="Topic" x-model="form.topic" />
+          <textarea class="av-input min-h-24" name="frontText" placeholder="Front text" x-model="form.frontText" required></textarea>
+          <textarea class="av-input min-h-24" name="backText" placeholder="Back text" x-model="form.backText" required></textarea>
+          <input class="av-input" name="pronunciation" placeholder="Pronunciation (optional)" x-model="form.pronunciation" />
+          <textarea class="av-input min-h-24" name="exampleText" placeholder="Example sentence (optional)" x-model="form.exampleText"></textarea>
+          <textarea class="av-input min-h-24" name="notes" placeholder="Notes (optional)" x-model="form.notes"></textarea>
+          <button class="av-btn" type="submit">Update flashcard</button>
+        </form>
+      </div>
+    </div>
+  </main>
+</AppShell>
