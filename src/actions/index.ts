@@ -1,6 +1,6 @@
 import { defineAction, ActionError, type ActionAPIContext } from "astro:actions";
 import { z } from "astro:schema";
-import { LanguageFlashcards, and, db, desc, eq } from "astro:db";
+import { VocabDecks, and, db, desc, eq } from "astro:db";
 import { emitDashboardSummary, maybeEmitHighSignalNotification } from "../lib/integrations";
 
 function requireUser(context: ActionAPIContext) {
@@ -19,8 +19,8 @@ function requireUser(context: ActionAPIContext) {
 async function requireOwnedFlashcard(id: number, userId: string) {
   const [flashcard] = await db
     .select()
-    .from(LanguageFlashcards)
-    .where(and(eq(LanguageFlashcards.id, id), eq(LanguageFlashcards.userId, userId)));
+    .from(VocabDecks)
+    .where(and(eq(VocabDecks.id, id), eq(VocabDecks.ownerId, userId)));
 
   if (!flashcard) {
     throw new ActionError({ code: "NOT_FOUND", message: "Flashcard not found." });
@@ -46,20 +46,21 @@ function normalizeNullable(value?: string) {
 
 export const server = {
   createLanguageFlashcard: defineAction({
+    accept: "form",
     input: flashcardPayload,
     handler: async (input, context) => {
       const user = requireUser(context);
       const now = new Date();
 
       const existingCount = await db
-        .select({ id: LanguageFlashcards.id })
-        .from(LanguageFlashcards)
-        .where(eq(LanguageFlashcards.userId, user.id));
+        .select({ id: VocabDecks.id })
+        .from(VocabDecks)
+        .where(eq(VocabDecks.ownerId, user.id));
 
       const [flashcard] = await db
-        .insert(LanguageFlashcards)
+        .insert(VocabDecks)
         .values({
-          userId: user.id,
+          ownerId: user.id,
           language: normalizeNullable(input.language),
           deck: normalizeNullable(input.deck),
           topic: normalizeNullable(input.topic),
@@ -92,13 +93,14 @@ export const server = {
   }),
 
   updateLanguageFlashcard: defineAction({
+    accept: "form",
     input: flashcardPayload.extend({ id: z.number().int() }),
     handler: async (input, context) => {
       const user = requireUser(context);
       await requireOwnedFlashcard(input.id, user.id);
 
       const [flashcard] = await db
-        .update(LanguageFlashcards)
+        .update(VocabDecks)
         .set({
           language: normalizeNullable(input.language),
           deck: normalizeNullable(input.deck),
@@ -110,7 +112,7 @@ export const server = {
           notes: normalizeNullable(input.notes),
           updatedAt: new Date(),
         })
-        .where(eq(LanguageFlashcards.id, input.id))
+        .where(eq(VocabDecks.id, input.id))
         .returning();
 
       await emitDashboardSummary(user.id);
@@ -120,6 +122,7 @@ export const server = {
   }),
 
   archiveLanguageFlashcard: defineAction({
+    accept: "form",
     input: z.object({ id: z.number().int() }),
     handler: async (input, context) => {
       const user = requireUser(context);
@@ -127,9 +130,9 @@ export const server = {
       const now = new Date();
 
       const [flashcard] = await db
-        .update(LanguageFlashcards)
+        .update(VocabDecks)
         .set({ status: "archived", archivedAt: now, updatedAt: now })
-        .where(eq(LanguageFlashcards.id, input.id))
+        .where(eq(VocabDecks.id, input.id))
         .returning();
 
       await emitDashboardSummary(user.id);
@@ -139,6 +142,7 @@ export const server = {
   }),
 
   restoreLanguageFlashcard: defineAction({
+    accept: "form",
     input: z.object({ id: z.number().int() }),
     handler: async (input, context) => {
       const user = requireUser(context);
@@ -146,9 +150,9 @@ export const server = {
       const now = new Date();
 
       const [flashcard] = await db
-        .update(LanguageFlashcards)
+        .update(VocabDecks)
         .set({ status: "active", archivedAt: null, updatedAt: now })
-        .where(eq(LanguageFlashcards.id, input.id))
+        .where(eq(VocabDecks.id, input.id))
         .returning();
 
       await emitDashboardSummary(user.id);
@@ -158,6 +162,7 @@ export const server = {
   }),
 
   toggleLanguageFlashcardFavorite: defineAction({
+    accept: "form",
     input: z.object({ id: z.number().int() }),
     handler: async (input, context) => {
       const user = requireUser(context);
@@ -165,19 +170,19 @@ export const server = {
       const now = new Date();
 
       const [flashcard] = await db
-        .update(LanguageFlashcards)
+        .update(VocabDecks)
         .set({ isFavorite: !existing.isFavorite, updatedAt: now })
-        .where(eq(LanguageFlashcards.id, input.id))
+        .where(eq(VocabDecks.id, input.id))
         .returning();
 
       if (!existing.isFavorite && flashcard.isFavorite) {
         const favorites = await db
-          .select({ id: LanguageFlashcards.id })
-          .from(LanguageFlashcards)
+          .select({ id: VocabDecks.id })
+          .from(VocabDecks)
           .where(
             and(
-              eq(LanguageFlashcards.userId, user.id),
-              eq(LanguageFlashcards.isFavorite, true)
+              eq(VocabDecks.ownerId, user.id),
+              eq(VocabDecks.isFavorite, true)
             )
           );
 
@@ -211,19 +216,19 @@ export const server = {
         status === "all"
           ? await db
               .select()
-              .from(LanguageFlashcards)
-              .where(eq(LanguageFlashcards.userId, user.id))
-              .orderBy(desc(LanguageFlashcards.updatedAt))
+              .from(VocabDecks)
+              .where(eq(VocabDecks.ownerId, user.id))
+              .orderBy(desc(VocabDecks.updatedAt))
           : await db
               .select()
-              .from(LanguageFlashcards)
+              .from(VocabDecks)
               .where(
                 and(
-                  eq(LanguageFlashcards.userId, user.id),
-                  eq(LanguageFlashcards.status, status)
+                  eq(VocabDecks.ownerId, user.id),
+                  eq(VocabDecks.status, status)
                 )
               )
-              .orderBy(desc(LanguageFlashcards.updatedAt));
+              .orderBy(desc(VocabDecks.updatedAt));
 
       return { success: true, data: { items: rows, total: rows.length } };
     },

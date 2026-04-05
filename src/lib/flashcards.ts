@@ -1,18 +1,18 @@
-import { LanguageFlashcards, and, db, desc, eq } from "astro:db";
+import { VocabDecks, and, db, desc, eq } from "astro:db";
 
 export async function listLanguageFlashcardsForUser(userId: string) {
   return db
     .select()
-    .from(LanguageFlashcards)
-    .where(eq(LanguageFlashcards.userId, userId))
-    .orderBy(desc(LanguageFlashcards.updatedAt));
+    .from(VocabDecks)
+    .where(eq(VocabDecks.ownerId, userId))
+    .orderBy(desc(VocabDecks.updatedAt));
 }
 
 export async function getLanguageFlashcardDetailForUser(id: number, userId: string) {
   const [flashcard] = await db
     .select()
-    .from(LanguageFlashcards)
-    .where(and(eq(LanguageFlashcards.id, id), eq(LanguageFlashcards.userId, userId)));
+    .from(VocabDecks)
+    .where(and(eq(VocabDecks.id, id), eq(VocabDecks.ownerId, userId)));
 
   return flashcard ?? null;
 }

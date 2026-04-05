@@ -1,9 +1,9 @@
-import { db, LanguageFlashcards } from "astro:db";
+import { db, VocabDecks } from "astro:db";
 
 export default async function seed() {
-  await db.insert(LanguageFlashcards).values([
+  await db.insert(VocabDecks).values([
     {
-      userId: "demo-user",
+      ownerId: "demo-user",
       language: "Spanish",
       deck: "Travel",
       topic: "Basics",
