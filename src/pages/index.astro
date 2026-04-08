@@ -1,39 +1,157 @@
 ---
 import AppShell from "../layouts/AppShell.astro";
-import { AvButton, AvContainer } from "@ansiversa/components";
+import LandingPageStandard from "../components/landing/LandingPageStandard.astro";
+import type { LandingPageContent } from "../lib/landing";
 
 const title = "Language Flashcards | Ansiversa";
-const description =
-  "Create, organize, and review language flashcards in a premium personal workspace.";
+const description = "Build and organize a personal flashcard library with favorites, filters, and archive-safe review.";
+const rootAppUrl = Astro.locals.rootAppUrl ?? "https://ansiversa.com";
+const appUrl = new URL("/app", Astro.url).toString();
+const signInUrl = new URL("/login", rootAppUrl);
+signInUrl.searchParams.set("returnTo", appUrl);
+const startHref = Astro.locals.isAuthenticated ? "/app" : signInUrl.toString();
+
+const landingContent: LandingPageContent = {
+  categoryLabel: "Study Workspace",
+  appLabel: "Authenticated DB-backed workspace",
+  title: "Keep your flashcards organized instead of burying them in scattered study notes.",
+  subtitle:
+    "Create personal flashcards, organize them by language, deck, and topic, mark favorites, archive older cards, and review the full detail when needed.",
+  heroBullets: [
+    "Save front and back text with pronunciation, examples, and notes in one personal card record",
+    "Use language, deck, topic, and favorite filters to focus the active study set",
+    "Archive and restore cards without deleting the flashcard library you have built",
+  ],
+  primaryCta: {
+    label: Astro.locals.isAuthenticated ? "Open Workspace" : "Sign in to Open",
+    href: startHref,
+  },
+  secondaryCta: {
+    label: "See Workflow",
+    href: "#workflow",
+    variant: "ghost",
+  },
+  heroNote:
+    "Current V1 is a manual flashcard library. It is not a quiz engine, spaced-repetition scoring system, or collaborative classroom tool.",
+  heroPanel: {
+    eyebrow: "Flashcard flow",
+    title: "Create → Organize → Review",
+    steps: [
+      "1. Save the flashcard in your protected workspace",
+      "2. Organize cards by language, deck, topic, and favorite state",
+      "3. Archive older cards without losing the library history",
+    ],
+    meta: [
+      { value: "DB", label: "Persistence" },
+      { value: "Per-user", label: "Ownership" },
+    ],
+  },
+  features: {
+    title: "What Language Flashcards gives you in V1",
+    lead:
+      "The product is built for personal flashcard organization and review, not for quiz scoring or automatic spaced repetition.",
+    items: [
+      {
+        title: "Structured flashcard records",
+        description:
+          "Keep front and back text, pronunciation, examples, and notes together in one owner-scoped flashcard entry.",
+      },
+      {
+        title: "Language, deck, and topic filters",
+        description:
+          "Use the workspace filters to focus on a specific language or study set without flattening the whole library into one list.",
+      },
+      {
+        title: "Favorite and archive controls",
+        description:
+          "Mark important cards and move older material out of the active set while keeping the study history intact.",
+      },
+      {
+        title: "Safe detail review",
+        description:
+          "Open the detail route for full reading and state changes, then return to the workspace when the card is in good shape.",
+      },
+    ],
+  },
+  pillars: {
+    title: "Why this works better than a loose stack of vocabulary notes",
+    lead:
+      "The product stays disciplined on purpose: one protected flashcard library, one clear card model, and one consistent way to organize the study set over time.",
+    items: [
+      {
+        title: "Truthful product boundary",
+        description:
+          "This is a personal flashcard workspace for storing and organizing cards, not a quiz platform and not a spaced-repetition engine.",
+      },
+      {
+        title: "Card-library structure",
+        description:
+          "Language, deck, topic, favorites, and archive state make the flashcard set easier to use than a flat note list.",
+      },
+      {
+        title: "Manual review clarity",
+        description:
+          "The app helps you organize and revisit study material without hiding the cards behind automated scoring logic.",
+      },
+      {
+        title: "Protected personal access",
+        description:
+          "Protected routes and owner checks keep one user’s flashcard library private and dependable.",
+      },
+    ],
+  },
+  workflow: {
+    eyebrow: "How it works",
+    title: "Move from card capture to a flashcard library you can keep using",
+    lead:
+      "The workflow is designed for one user managing a personal study set that stays useful as the card library grows.",
+    steps: [
+      {
+        title: "Create the card",
+        description:
+          "Start in the protected workspace and save the flashcard you want to keep in your own study library.",
+      },
+      {
+        title: "Organize the study set",
+        description:
+          "Use language, deck, topic, favorite, and archive controls to shape the active card set around what you need right now.",
+      },
+      {
+        title: "Open details for full review",
+        description:
+          "Use the detail route when the card needs fuller reading or state updates, then return to the workspace once it is ready.",
+      },
+    ],
+  },
+  showcase: {
+    eyebrow: "Current product shape",
+    title: "Built for flashcard organization, not quiz scoring",
+    description:
+      "The landing copy stays aligned to the verified implementation: Language Flashcards helps one authenticated user maintain a DB-backed flashcard library with filters, favorites, archive state, and safe detail review.",
+    bullets: [
+      "Good fit for learners organizing private flashcards by language, deck, and topic",
+      "Centered on manual card creation, favorite/archive control, filters, and detail review",
+    ],
+    calloutLabel: "Freeze truth",
+    calloutValue: "Manual flashcard library only",
+  },
+  finalCta: {
+    title: "Start building a flashcard library you can keep returning to",
+    description:
+      "Open the workspace, save the cards properly, and keep the most useful study material easy to surface later.",
+    primaryCta: {
+      label: Astro.locals.isAuthenticated ? "Open Workspace" : "Sign in to Open",
+      href: startHref,
+    },
+    secondaryCta: {
+      label: "Review Features",
+      href: "#features",
+      variant: "ghost",
+    },
+  },
+};
 ---
 
 <AppShell title={title} description={description}>
-  <section class="av-hero">
-    <AvContainer size="narrow" className="av-hero__content--narrow">
-      <div class="av-hero__content">
-        <div class="av-kicker"><span>Language Learning · Ansiversa Mini App</span></div>
-        <h1 class="av-gradient-text">Build your language memory, one card at a time.</h1>
-        <p>
-          Language Flashcards gives you a clean workspace for vocabulary mastery with favorites,
-          organized decks, archive history, and focused review.
-        </p>
-      </div>
-      <div class="av-cta-row">
-        <AvButton href="/app">Open Workspace</AvButton>
-      </div>
-    </AvContainer>
-  </section>
-
-  <section class="av-section">
-    <AvContainer size="narrow">
-      <div class="av-section-header">
-        <h2 class="av-section-title">Everything you need in V1</h2>
-      </div>
-      <ul class="av-section-body list-disc space-y-2 pl-5 text-slate-300">
-        <li>Create and edit cards with front/back, pronunciation, examples, and notes.</li>
-        <li>Organize by language, deck, and topic with lightweight filters.</li>
-        <li>Favorite key flashcards, archive older ones, and keep full history.</li>
-      </ul>
-    </AvContainer>
-  </section>
+  <LandingPageStandard content={landingContent} />
 </AppShell>

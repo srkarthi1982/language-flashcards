@@ -25,6 +25,7 @@ MANDATORY: After completing each task, update this repo’s AGENTS.md Task Log (
 - Review this repo's existing AGENTS.md Task Log history before making changes.
 
 ## Task Log (Recent)
+- 2026-04-08 Rolled out Landing Page Standard V1.1: replaced the minimal landing with the approved Ansiversa product-storytelling landing, kept the protected DB-backed flashcard-library positioning aligned to app-spec reality, and revalidated `npm run typecheck`, `npm run build`, `/`, and CTA sign-in flow.
 - 2026-04-05 Completed Freeze Level 1 spec-driven verification; fixed remote DB schema compatibility against the live V1 table and corrected form-backed Astro actions to accept FormData, then re-ran db push, typecheck, build, and live runtime checks.
 - 2026-03-30 Populated app-spec.md with implementation-aligned V1 documentation based on current repo behavior and conservative pre-verification review.
 - 2026-03-30 Initialized app-spec.md using standard V1 template from web repo.
